@@ -112,8 +112,37 @@ int Projectile::getAge() {
     return this->age;
 }
 
+Asteroid::Asteroid(bool adult) {
+    this->name = "Asteroid";
+    sf::ConvexShape* asteroid = new sf::ConvexShape();
+    asteroid->setPointCount(6);
+    asteroid->setPoint(0, sf::Vector2f(0, 45));
+    asteroid->setPoint(1, sf::Vector2f(3, 60));
+    asteroid->setPoint(2, sf::Vector2f(55, 50));
+    asteroid->setPoint(3, sf::Vector2f(65, 25));
+    asteroid->setPoint(4, sf::Vector2f(45, 5));
+    asteroid->setPoint(5, sf::Vector2f(15, 0));
+    asteroid->setFillColor(sf::Color::Black);
+    asteroid->setOutlineColor(sf::Color::White);
+    asteroid->setOutlineThickness(1);
+
+    if(adult) {
+        asteroid->setScale(3.0, 3.0);
+    }
+
+    this->object = asteroid;
+    this->object->setPosition(1000, 150);
+    this->object->setOrigin(33, 33);
+    // set up random spawn and location and the scale of asteroid
+    this->v = calcV(0);
+
+}
+
 Projectile ProjectileFactory::createProjectile(sf::Vector2f origin, float angle) {
     return Projectile(origin, angle);
+}
+Asteroid AsteroidFactory::createAsteroid(bool adult) {
+    return Asteroid(adult);
 }
 
 

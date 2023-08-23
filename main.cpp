@@ -27,6 +27,11 @@ int main () {
     std::vector<Projectile> projectiles;
     ProjectileFactory projectileFactory;
 
+    // vector for asteroids
+    std::vector<Asteroid> asteroids;
+    AsteroidFactory asteroidFactory;
+    asteroids.push_back(asteroidFactory.createAsteroid(true));
+    // load in player
     Player player(WindowInfo::windowX/2, WindowInfo::windowY/2);
 
     // debug info for player-----------------------------------
@@ -64,10 +69,15 @@ int main () {
     player.updateLocation();
     window.clear();
     window.draw(info);
+    
+    for(auto& asteroid : asteroids) {
+        asteroid.updateLocation();
+        asteroid.draw(window);
+    }
     for(auto& projectile : projectiles) {
         projectile.updateLocation();
         projectile.setAge(projectile.getAge() + 1);
-        if(projectile.getAge() > 100) {
+        if(projectile.getAge() > 75) {
             projectiles.erase(projectiles.begin());
         } 
 
@@ -81,6 +91,9 @@ int main () {
     }
 
     delete player.object;
+    for(auto& projectile : projectiles) {
+        delete projectile.object;
+    }
 
     return 0;
 }
