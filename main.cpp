@@ -16,11 +16,14 @@
 #include <cmath>
 #include <string>
 
-// TODO: load in asteroids and collision detection
+// TODO: collision detection
 
 int main () {
+    int lvl = 1;
+    bool lvlTest = true;
+    srand(time(nullptr));
     sf::RenderWindow window(sf::VideoMode(WindowInfo::windowX, WindowInfo::windowY), "Asteroidz");
-    window.setPosition(sf::Vector2i(700,20));
+    //window.setPosition(sf::Vector2i(700,20));
     window.setFramerateLimit(60);
 
     // vector for bullets
@@ -30,7 +33,7 @@ int main () {
     // vector for asteroids
     std::vector<Asteroid> asteroids;
     AsteroidFactory asteroidFactory;
-    asteroids.push_back(asteroidFactory.createAsteroid(true));
+
     // load in player
     Player player(WindowInfo::windowX/2, WindowInfo::windowY/2);
 
@@ -48,7 +51,6 @@ int main () {
                 window.close();
             }
             if((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space)) {
-                std::cout << "Space Pressed\n";
                 projectiles.push_back(projectileFactory.createProjectile(player.object->getTransform().transformPoint(player.object->getPoint(2)),
                                                                          player.object->getRotation()));
             }
@@ -59,38 +61,44 @@ int main () {
             player.shipControls(event.key.code);
 
         }
-/*
-    info.setString("Velocity: " + std::to_string(player.calcMag()) 
-            + "\nRotation: " + std::to_string(player.object->getRotation())
-            + "\nX: " + std::to_string(player.calcMag() * std::sin(player.object->getRotation())) 
-            + "\nY: " + std::to_string(player.calcMag() * std::cos(player.object->getRotation())));
-*/
+        if(lvlTest) {
+            for(int i = 0 ; i < lvl + 3 ; i++) {
+                asteroids.push_back(asteroidFactory.createAsteroid(true, player.object->getPosition(), rand()));
+            } 
+            lvl +=1;
+            lvlTest = false;
+        }
 
-    player.updateLocation();
-    window.clear();
-    window.draw(info);
-    
-    for(auto& asteroid : asteroids) {
-        asteroid.updateLocation();
-        asteroid.draw(window);
-    }
-    for(auto& projectile : projectiles) {
-        projectile.updateLocation();
-        projectile.setAge(projectile.getAge() + 1);
-        if(projectile.getAge() > 75) {
-            projectiles.erase(projectiles.begin());
-        } 
+        player.updateLocation();
 
-        projectile.draw(window);
-    }
-    player.draw(window);
-    window.display();
+        window.clear();
+        window.draw(info);
 
-    
+        for(auto& asteroid : asteroids) {
+            asteroid.updateLocation();
+            asteroid.draw(window);
+        }
+
+        for(auto& projectile : projectiles) {
+            projectile.updateLocation();
+            projectile.setAge(projectile.getAge() + 1);
+            if(projectile.getAge() > 75) {
+                projectiles.erase(projectiles.begin());
+            } 
+
+            projectile.draw(window);
+        }
+        player.draw(window);
+        window.display();
+
+
 
     }
 
     delete player.object;
+    for(auto& asteroid : asteroids) {
+        delete asteroid.object;
+    }
     for(auto& projectile : projectiles) {
         delete projectile.object;
     }

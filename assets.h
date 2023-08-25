@@ -49,7 +49,7 @@ class Projectile : public GameObject {
 
 class Asteroid : public GameObject {
     public:
-        Asteroid(bool adult);
+        Asteroid(bool adult, sf::Vector2f spawnVariable, int seed);
 };
 
 class ProjectileFactory {
@@ -59,6 +59,6 @@ class ProjectileFactory {
 
 class AsteroidFactory {
     public:
-        Asteroid createAsteroid(bool adult);
+        Asteroid createAsteroid(bool adult, sf::Vector2f spawnVariable, int seed);
 };
 #endif // ASSETS_H

@@ -13,6 +13,8 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Window.hpp>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include <string>
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -112,7 +114,10 @@ int Projectile::getAge() {
     return this->age;
 }
 
-Asteroid::Asteroid(bool adult) {
+Asteroid::Asteroid(bool adult, sf::Vector2f spawnVariable, int seed) {
+    unsigned int xRand, yRand;
+    int angleRand;
+
     this->name = "Asteroid";
     sf::ConvexShape* asteroid = new sf::ConvexShape();
     asteroid->setPointCount(6);
@@ -127,22 +132,61 @@ Asteroid::Asteroid(bool adult) {
     asteroid->setOutlineThickness(1);
 
     if(adult) {
+        // logic for random asteroid placement
+        srand(seed);
+        unsigned int minRangeX = spawnVariable.x - 200;
+        unsigned int maxRangeX = spawnVariable.x + 200;
+        unsigned int minRangeY = spawnVariable.y - 200;
+        unsigned int maxRangeY = spawnVariable.y + 200;
+        unsigned int largerMinX = 0;
+        unsigned int largerMaxX = WindowInfo::windowX;
+        unsigned int largerMinY = 0;
+        unsigned int largerMaxY = WindowInfo::windowY;
+
+        // get rand # inside range
+        xRand = largerMinX + rand() % (largerMaxX - largerMinX + 1);
+        yRand = largerMinY + rand() % (largerMaxY - largerMinY + 1);
+
+        // make sure that it is away from the asteroid
+        if(xRand >= minRangeX && xRand <= maxRangeX) {
+            if(rand() % 2 == 0) {
+                xRand = largerMaxX + rand() % (largerMaxX - maxRangeX + 1);
+            } else {
+                xRand = largerMinX + rand() % (minRangeX - largerMinX + 1);
+            }
+        }
+        if(yRand >= minRangeY && yRand <= maxRangeY) {
+            if(rand() % 2 == 0) {
+                yRand = largerMaxY + rand() % (largerMaxY - maxRangeY + 1);
+            } else {
+                yRand = largerMinY + rand() % (minRangeY - largerMinY + 1);
+            }
+        }
+        // logic for random angle
+        angleRand = rand() % (360 + 1);
+
         asteroid->setScale(3.0, 3.0);
+    } else {
+        xRand = spawnVariable.x;
+        yRand = spawnVariable.y;
     }
 
     this->object = asteroid;
-    this->object->setPosition(1000, 150);
+
+    // randomly genreate locations and rotations for asteroids
+    this->object->setPosition(xRand, yRand);
     this->object->setOrigin(33, 33);
-    // set up random spawn and location and the scale of asteroid
-    this->v = calcV(0);
+    // random angles for asteroid orientation
+    this->object->setRotation(angleRand);
+    this->v = calcV(1);
 
 }
 
 Projectile ProjectileFactory::createProjectile(sf::Vector2f origin, float angle) {
     return Projectile(origin, angle);
 }
-Asteroid AsteroidFactory::createAsteroid(bool adult) {
-    return Asteroid(adult);
+Asteroid AsteroidFactory::createAsteroid(bool adult, sf::Vector2f spawnVariable, int seed) {
+    return Asteroid(adult, spawnVariable, seed);
 }
 
 
