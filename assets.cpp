@@ -77,19 +77,19 @@ Player::Player(int x, int y) {
 void Player::shipControls(sf::Keyboard::Key key) {
     if(key == sf::Keyboard::Key::Up){
         sf::Vector2f additionalV = calcV(0.1);
-        if(this->v.x * additionalV.x > 0) {
-            additionalV.x *= 1.5;
+        if(this->v.x * additionalV.x < 0) {
+            additionalV.x *= 3;
         }
-        if(this->v.y * additionalV.y > 0) {
-            additionalV.y *= 1.5;
+        if(this->v.y * additionalV.y < 0) {
+            additionalV.y *= 3;
         }
         this->v += additionalV;
     } else if (key == sf::Keyboard::Key::Down) {
         //v -= .1;
     } else if(key == sf::Keyboard::Key::Right){
-        object->rotate(2.0);
+        object->rotate(3.0);
     } else if(key == sf::Keyboard::Key::Left){
-        object->rotate(-2.0);
+        object->rotate(-3.0);
     } 
 }
 
@@ -132,6 +132,7 @@ Asteroid::Asteroid(bool adult, sf::Vector2f spawnVariable, int seed) {
     asteroid->setOutlineThickness(1);
 
     if(adult) {
+        this->adult = adult;        
         // logic for random asteroid placement
         srand(seed);
         unsigned int minRangeX = spawnVariable.x - 200;
@@ -167,8 +168,10 @@ Asteroid::Asteroid(bool adult, sf::Vector2f spawnVariable, int seed) {
 
         asteroid->setScale(3.0, 3.0);
     } else {
+        this->adult = adult;
         xRand = spawnVariable.x;
         yRand = spawnVariable.y;
+        angleRand = rand() % (360 + 1);
     }
 
     this->object = asteroid;
@@ -180,6 +183,9 @@ Asteroid::Asteroid(bool adult, sf::Vector2f spawnVariable, int seed) {
     this->object->setRotation(angleRand);
     this->v = calcV(1);
 
+}
+bool Asteroid::getAdult() {
+    return this->adult;
 }
 
 Projectile ProjectileFactory::createProjectile(sf::Vector2f origin, float angle) {

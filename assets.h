@@ -50,6 +50,10 @@ class Projectile : public GameObject {
 class Asteroid : public GameObject {
     public:
         Asteroid(bool adult, sf::Vector2f spawnVariable, int seed);
+        bool getAdult();
+
+    private:
+        bool adult;
 };
 
 class ProjectileFactory {

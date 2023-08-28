@@ -6,6 +6,8 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Sleep.hpp>
+#include <SFML/System/Time.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -73,10 +75,34 @@ int main () {
 
         window.clear();
         window.draw(info);
-
+        int j = 0;
         for(auto& asteroid : asteroids) {
             asteroid.updateLocation();
+             
+            //TODO: check for collison with more exact mesurments and destroy graphics
+            int i = 0;
+            for(auto& projectile : projectiles) {
+                if(projectile.object->getGlobalBounds().intersects(asteroid.object->getGlobalBounds())) {
+                    projectiles.erase(projectiles.begin() + i);
+
+                    if(asteroid.getAdult()) {
+                        // spawn two smaller asteroids
+                        asteroids.push_back(asteroidFactory.createAsteroid(false, asteroid.object->getPosition(), rand()));
+                        asteroids.push_back(asteroidFactory.createAsteroid(false, asteroid.object->getPosition(), rand()));
+                    } 
+
+                    asteroids.erase(asteroids.begin() + j);
+                }
+                i++;
+            }
+
+
+            if(player.object->getGlobalBounds().intersects(asteroid.object->getGlobalBounds())) {
+                // destroy ship
+                return 0;
+            }
             asteroid.draw(window);
+            j++;
         }
 
         for(auto& projectile : projectiles) {
@@ -90,8 +116,6 @@ int main () {
         }
         player.draw(window);
         window.display();
-
-
 
     }
 
