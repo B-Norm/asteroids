@@ -17,6 +17,7 @@
 #include <SFML/Window.hpp>
 #include <cmath>
 #include <string>
+#include <vector>
 
 
 int main () {
@@ -25,10 +26,12 @@ int main () {
     int totalScore = 0;
     int scoreAdult = 500;
     int scoreChild = 1000;
-
+    int range = 360 / Debris::count;
+    int timer = 0;
     srand(time(nullptr));
+
     sf::RenderWindow window(sf::VideoMode(WindowInfo::windowX, WindowInfo::windowY), "Asteroidz");
-    //window.setPosition(sf::Vector2i(700,20));
+    window.setPosition(sf::Vector2i(700,20));
     window.setFramerateLimit(60);
 
     // vector for bullets
@@ -39,13 +42,16 @@ int main () {
     std::vector<Asteroid> asteroids;
     AsteroidFactory asteroidFactory;
 
+    std::vector<Debris> debris;
+    DebrisFactory debrisFactory;
+
     // load in player
     Player player(WindowInfo::windowX/2, WindowInfo::windowY/2);
 
     // debug info for player-----------------------------------
     sf::Font font;
     font.loadFromFile("runescape_uf.ttf");
-    sf::Text info("Score: ", font, 24);
+    sf::Text info("Score: ", font, 48);
     info.setFillColor(sf::Color::White);
     info.setPosition(10.f,10.f);
 
@@ -79,7 +85,6 @@ int main () {
         player.updateLocation();
 
         window.clear();
-        window.draw(info);
         int j = 0;
         for(auto& asteroid : asteroids) {
             asteroid.updateLocation();
@@ -89,6 +94,13 @@ int main () {
             for(auto& projectile : projectiles) {
                 if(projectile.object->getGlobalBounds().intersects(asteroid.object->getGlobalBounds())) {
                     projectiles.erase(projectiles.begin() + i);
+                    
+                    // create Explosion
+                    for(int k = 0 ; k < Debris::count ; k++ ) {
+                        // find range of random spawning of debris based on #
+                        debris.push_back(debrisFactory.createDebris(asteroid.object->getPosition(), range, (k + 1), rand()));
+                        debris[k].setLife(timer - 1);
+                    }
 
                     if(asteroid.getAdult()) {
                         // spawn two smaller asteroids
@@ -117,6 +129,7 @@ int main () {
            lvlTest = true;  
         }
 
+        // draw projectiles
         for(auto& projectile : projectiles) {
             projectile.updateLocation();
             projectile.setAge(projectile.getAge() + 1);
@@ -126,14 +139,35 @@ int main () {
 
             projectile.draw(window);
         }
+        // draw Debris if any
+        j = 0;
+        for(auto& debri : debris) {
+            debri.updateLocation();
+            
+            if(debri.getLife() == timer) {
+                debris.erase(debris.begin() + j);
+            } 
+
+            debri.draw(window);
+        }
         player.draw(window);
+
+        window.draw(info);
         window.display();
 
+        if(timer != 60) {
+            timer++;
+        } else {
+            timer = 0;
+        }
     }
 
     delete player.object;
     for(auto& asteroid : asteroids) {
         delete asteroid.object;
+    }
+    for(auto& debri : debris) {
+        delete debri.object;
     }
     for(auto& projectile : projectiles) {
         delete projectile.object;

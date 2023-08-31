@@ -56,6 +56,18 @@ class Asteroid : public GameObject {
         bool adult;
 };
 
+class Debris : public GameObject {
+    public:
+        Debris(sf::Vector2f spawn, int range, int index, int seed);
+        static int count;
+
+        int getLife();
+        void setLife(int life);
+        
+    private:
+        int life;
+};
+
 class ProjectileFactory {
     public:
         Projectile createProjectile(sf::Vector2f origin, float angle);
@@ -64,5 +76,10 @@ class ProjectileFactory {
 class AsteroidFactory {
     public:
         Asteroid createAsteroid(bool adult, sf::Vector2f spawnVariable, int seed);
+};
+
+class DebrisFactory {
+    public:
+        Debris createDebris(sf::Vector2f spawn, int range, int index, int seed);
 };
 #endif // ASSETS_H

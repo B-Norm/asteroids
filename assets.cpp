@@ -22,6 +22,8 @@
 int WindowInfo::windowX = 1200;
 int WindowInfo::windowY = 900;
 
+int Debris::count = 18;
+
 sf::Vector2f GameObject::calcV(float mag) {
     float x, y;
     float PI = 3.14159265;
@@ -188,11 +190,37 @@ bool Asteroid::getAdult() {
     return this->adult;
 }
 
+Debris::Debris(sf::Vector2f spawn, int range, int index, int seed) {
+    srand(seed);
+    unsigned int randAngle = rand() % (range + 1);
+    randAngle += (range * index);
+
+
+    sf::RectangleShape* debris = new sf::RectangleShape();
+    debris->setSize(sf::Vector2f(1, 1));
+    debris->setFillColor(sf::Color::White);
+    
+    object = debris;
+    object->setPosition(spawn);
+    object->setRotation(randAngle);
+    this->v = calcV(.5);
+
+}
+void Debris::setLife(int life) {
+    this->life = life;
+}
+int Debris::getLife(){
+    return this->life;
+}
+
 Projectile ProjectileFactory::createProjectile(sf::Vector2f origin, float angle) {
     return Projectile(origin, angle);
 }
 Asteroid AsteroidFactory::createAsteroid(bool adult, sf::Vector2f spawnVariable, int seed) {
     return Asteroid(adult, spawnVariable, seed);
+}
+Debris DebrisFactory::createDebris(sf::Vector2f spawn, int range, int index, int seed) {
+    return Debris(spawn, range, index, seed);
 }
 
 
