@@ -18,11 +18,14 @@
 #include <cmath>
 #include <string>
 
-// TODO: collision detection
 
 int main () {
     int lvl = 1;
     bool lvlTest = true;
+    int totalScore = 0;
+    int scoreAdult = 500;
+    int scoreChild = 1000;
+
     srand(time(nullptr));
     sf::RenderWindow window(sf::VideoMode(WindowInfo::windowX, WindowInfo::windowY), "Asteroidz");
     //window.setPosition(sf::Vector2i(700,20));
@@ -42,7 +45,7 @@ int main () {
     // debug info for player-----------------------------------
     sf::Font font;
     font.loadFromFile("runescape_uf.ttf");
-    sf::Text info("stuff", font, 24);
+    sf::Text info("Score: ", font, 24);
     info.setFillColor(sf::Color::White);
     info.setPosition(10.f,10.f);
 
@@ -71,6 +74,8 @@ int main () {
             lvlTest = false;
         }
 
+        info.setString("Score: " + std::to_string(totalScore));
+
         player.updateLocation();
 
         window.clear();
@@ -89,7 +94,10 @@ int main () {
                         // spawn two smaller asteroids
                         asteroids.push_back(asteroidFactory.createAsteroid(false, asteroid.object->getPosition(), rand()));
                         asteroids.push_back(asteroidFactory.createAsteroid(false, asteroid.object->getPosition(), rand()));
-                    } 
+                        totalScore += (scoreAdult * lvl);
+                    } else {
+                        totalScore += (scoreChild * lvl);
+                    }
 
                     asteroids.erase(asteroids.begin() + j);
                 }
@@ -103,6 +111,10 @@ int main () {
             }
             asteroid.draw(window);
             j++;
+        }
+
+        if(j == 0){
+           lvlTest = true;  
         }
 
         for(auto& projectile : projectiles) {
